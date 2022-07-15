@@ -127,6 +127,11 @@ public class BasicController {
         return "basic/javascript";
     }
 
+    @GetMapping("/fragment")
+    public String template() {
+        return "template/fragment/fragmentMain";
+    }
+
 
     private void addUsers(Model model) {
         ArrayList<Object> list = new ArrayList<>();
