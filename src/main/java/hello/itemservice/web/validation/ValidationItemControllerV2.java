@@ -96,7 +96,7 @@ public class ValidationItemControllerV2 {
         return "redirect:/validation/v2/items/{itemId}";
     }
 
-    @PostMapping("/add")
+    //@PostMapping("/add")
     public String addItemV2(@ModelAttribute Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes, Model model) {
 
         /*사용자의 입력 데이터가 컨트롤러의 @ModelAttribute 에 바인딩되는 시점에 오류가 발생하면 모델 객체에 사용자 입력 값을 유지하기 어렵다.
@@ -125,6 +125,57 @@ public class ValidationItemControllerV2 {
             int resultPrice = item.getPrice() * item.getQuantity();
             if(resultPrice < 10000) {
                 bindingResult.addError(new ObjectError("item",null, null, "가격 * 수량의 합은 10,000원 이상이어야 합니다. 현재 값 = " + resultPrice));
+            }
+        }
+
+        // 검증 실패시 다시 입력 폼으로
+        if(bindingResult.hasErrors()) {
+            log.info("errors={}", bindingResult);
+            return "validation/v2/addForm";
+        }
+
+        // 성공 로직
+
+        Item savedItem = itemRepository.save(item);
+        redirectAttributes.addAttribute("itemId", savedItem.getId());
+        redirectAttributes.addAttribute("status", true);
+        return "redirect:/validation/v2/items/{itemId}";
+    }
+
+
+    @PostMapping("/add")
+    public String addItemV3(@ModelAttribute Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes, Model model) {
+
+        /*사용자의 입력 데이터가 컨트롤러의 @ModelAttribute 에 바인딩되는 시점에 오류가 발생하면 모델 객체에 사용자 입력 값을 유지하기 어렵다.
+        예를 들어서 가격에 숫자가 아닌 문자가 입력된다면 가격은 Integer 타입이므로 문자를 보관할 수 있는 방법이 없다.
+        그래서 오류가 발생한 경우 사용자 입력 값을 보관하는 별도의 방법이 필요하다.
+        그리고 이렇게 보관한 사용자 입력 값을 검증 오류 발생시 화면에 다시 출력하면 된다.
+        FieldError 는 오류 발생시 사용자 입력 값을 저장하는 기능을 제공한다.
+        여기서 rejectedValue 가 바로 오류 발생시 사용자 입력 값을 저장하는 필드다.
+        bindingFailure 는 타입 오류 같은 바인딩이 실패했는지 여부를 적어주면 된다. 여기서는 바인딩이 실패한 것은 아니기 때문에 false 를 사용한다.*/
+
+        //검증 로직
+        if(!StringUtils.hasText(item.getItemName())) {
+            bindingResult.addError(new FieldError("item", "itemName", item.getItemName(),
+                    false, new String[]{"required.item.itemName"}, null, null));
+        }
+
+        if(item.getPrice() == null || item.getPrice() < 1000 || item.getPrice() > 1000000) {
+            bindingResult.addError(new FieldError("item", "price", item.getPrice(),
+                    false, new String[]{"range.item.price"}, new Object[]{1000, 10000},null));
+        }
+
+        if(item.getQuantity() == null || item.getQuantity() >= 9999) {
+            bindingResult.addError(new FieldError("item", "quantity", item.getQuantity(),
+                    false, new String[]{"max.item.quantity"}, new Object[]{9999}, null));
+        }
+
+        // 특정 필드가 아닌 복합 룰 검증
+        if(item.getPrice() != null && item.getQuantity() != null) {
+            int resultPrice = item.getPrice() * item.getQuantity();
+            if(resultPrice < 10000) {
+                bindingResult.addError(new ObjectError("item", new String[]{"totalPriceMin"},
+                        new Object[]{10000, resultPrice}, null));
             }
         }
 
