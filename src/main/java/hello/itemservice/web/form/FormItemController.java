@@ -50,6 +50,7 @@ public class FormItemController {
         //실행 로그
         //FormItemController : item.open=true //체크 박스를 선택하는 경우
         //FormItemController : item.open=false //체크 박스를 선택하지 않는 경우
+
         //체크 박스 체크
         //open=on&_open=on
         //체크 박스를 체크하면 스프링 MVC가 open 에 값이 있는 것을 확인하고 사용한다. 이때 _open 은
