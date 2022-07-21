@@ -37,4 +37,3 @@ class SessionManagerTest {
         assertThat(expired).isNull();
     }
 }
-
