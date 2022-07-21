@@ -18,18 +18,20 @@ public class Item {
     //따라서 오브젝트 오류(글로벌 오류)의 경우 @ScriptAssert 을 억지로 사용하는 것 보다는 다음과 같이
     //오브젝트 오류 관련 부분만 직접 자바 코드로 작성하는 것을 권장한다.
 
-    @NotNull // 요구사항 요청
+
+    // 현재 등록, 수정을 따로 적용시킨다
+    @NotNull(groups = UpdateCheck.class)
     private Long id;
 
-    @NotBlank
+    @NotBlank(groups = {SaveCheck.class, UpdateCheck.class})
     private String itemName;
 
-    @NotNull
-    @Range(min = 1000, max = 1000000)
+    @NotNull(groups = {SaveCheck.class, UpdateCheck.class})
+    @Range(min = 1000, max = 1000000, groups = {SaveCheck.class, UpdateCheck.class})
     private Integer price;
 
-    @NotNull
-    //@Max(9999) 요구사항 요청
+    @NotNull(groups = {SaveCheck.class, UpdateCheck.class})
+    @Max(value = 9999, groups = {SaveCheck.class})
     private Integer quantity;
 
     //문제점
