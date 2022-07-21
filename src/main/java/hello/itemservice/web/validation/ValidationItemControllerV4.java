@@ -4,6 +4,8 @@ import hello.itemservice.domain.item.Item;
 import hello.itemservice.domain.item.ItemRepository;
 import hello.itemservice.domain.item.SaveCheck;
 import hello.itemservice.domain.item.UpdateCheck;
+import hello.itemservice.web.validation.form.ItemSaveForm;
+import hello.itemservice.web.validation.form.ItemUpdateForm;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -68,15 +70,15 @@ public class ValidationItemControllerV4 {
 
 
     @PostMapping("/add")
-    public String addItem2(@Validated(SaveCheck.class) @ModelAttribute Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes) {
+    public String addItem2(@Validated @ModelAttribute("item") ItemSaveForm form, BindingResult bindingResult, RedirectAttributes redirectAttributes) {
 
-        //@Validated 는 검증기를 실행하라는 애노테이션이다.
-        //이 애노테이션이 붙으면 앞서 WebDataBinder 에 등록한 검증기를 찾아서 실행한다. 그런데 여러 검증기를
-        //등록한다면 그 중에 어떤 검증기가 실행되어야 할지 구분이 필요하다. 이때 supports() 가 사용된다.
+        //@ModelAttribute("item") 에 item 이름을 넣어준 부분을 주의하자. 이것을 넣지 않으면
+        //ItemSaveForm 의 경우 규칙에 의해 itemSaveForm 이라는 이름으로 MVC Model에 담기게 된다.
+        //이렇게 되면 뷰 템플릿에서 접근하는 th:object 이름도 함께 변경해주어야 한다.
 
         // 특정 필드가 아닌 복합 룰 검증
-        if(item.getPrice() != null && item.getQuantity() != null) {
-            int resultPrice = item.getPrice() * item.getQuantity();
+        if(form.getPrice() != null && form.getQuantity() != null) {
+            int resultPrice = form.getPrice() * form.getQuantity();
             if(resultPrice < 10000) {
                 bindingResult.reject("totalPriceMin", new Object[]{10000, resultPrice}, null);
             }
@@ -89,6 +91,11 @@ public class ValidationItemControllerV4 {
         }
 
         // 성공 로직
+        Item item = new Item();
+        item.setItemName(form.getItemName());
+        item.setPrice(form.getPrice());
+        item.setQuantity(form.getQuantity());
+
         Item savedItem = itemRepository.save(item);
         redirectAttributes.addAttribute("itemId", savedItem.getId());
         redirectAttributes.addAttribute("status", true);
@@ -109,32 +116,16 @@ public class ValidationItemControllerV4 {
         return "validation/v2/editForm";
     }
 
-    //@PostMapping("/{itemId}/edit")
-    public String edit1(@PathVariable Long itemId, @Validated @ModelAttribute Item item, BindingResult bindingResult) {
-
-        // 특정 필드가 아닌 복합 룰 검증
-        if(item.getPrice() != null && item.getQuantity() != null) {
-            int resultPrice = item.getPrice() * item.getQuantity();
-            if(resultPrice < 10000) {
-                bindingResult.reject("totalPriceMin", new Object[]{10000, resultPrice}, null);
-            }
-        }
-
-        if(bindingResult.hasErrors())
-        {
-            log.info("errros={}", bindingResult);
-            return "validation/v4/editForm";
-        }
-        itemRepository.update(itemId, item);
-        return "redirect:/validation/v4/items/{itemId}";
-    }
-
     @PostMapping("/{itemId}/edit")
-    public String edit2(@PathVariable Long itemId, @Validated(UpdateCheck.class) @ModelAttribute Item item, BindingResult bindingResult) {
+    public String edit(@PathVariable Long itemId, @Validated @ModelAttribute("item") ItemUpdateForm form, BindingResult bindingResult) {
+
+        //@ModelAttribute("item") 에 item 이름을 넣어준 부분을 주의하자. 이것을 넣지 않으면
+        //ItemSaveForm 의 경우 규칙에 의해 itemSaveForm 이라는 이름으로 MVC Model에 담기게 된다.
+        //이렇게 되면 뷰 템플릿에서 접근하는 th:object 이름도 함께 변경해주어야 한다.
 
         // 특정 필드가 아닌 복합 룰 검증
-        if(item.getPrice() != null && item.getQuantity() != null) {
-            int resultPrice = item.getPrice() * item.getQuantity();
+        if(form.getPrice() != null && form.getQuantity() != null) {
+            int resultPrice = form.getPrice() * form.getQuantity();
             if(resultPrice < 10000) {
                 bindingResult.reject("totalPriceMin", new Object[]{10000, resultPrice}, null);
             }
@@ -145,7 +136,13 @@ public class ValidationItemControllerV4 {
             log.info("errros={}", bindingResult);
             return "validation/v4/editForm";
         }
-        itemRepository.update(itemId, item);
+
+        Item itemParam = new Item();
+        itemParam.setItemName(form.getItemName());
+        itemParam.setPrice(form.getPrice());
+        itemParam.setQuantity(form.getQuantity());
+
+        itemRepository.update(itemId, itemParam);
         return "redirect:/validation/v4/items/{itemId}";
     }
 }
