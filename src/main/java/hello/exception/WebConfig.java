@@ -25,6 +25,8 @@ public class WebConfig implements WebMvcConfigurer {
                 //오류 페이지 경로
     }
 
+
+
     //@Bean
     public FilterRegistrationBean logFilter() {
         FilterRegistrationBean<Filter> filterRegistrationBean = new FilterRegistrationBean<>();
