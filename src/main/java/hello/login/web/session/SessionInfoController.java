@@ -30,11 +30,13 @@ public class SessionInfoController {
         log.info("lastAccessedTime={}", new Date(session.getLastAccessedTime()));
         log.info("isNew={}", session.isNew());
 
+
         //sessionId=0556EB7C7EEAE8143470F2012D8F0043
         //getMaxInactiveInterval=1800
         //creationTime=Fri Jul 22 09:08:50 KST 2022
         //lastAccessedTime=Fri Jul 22 09:08:50 KST 2022
         //isNew=false
+
 
         return "세션 출력";
     }
