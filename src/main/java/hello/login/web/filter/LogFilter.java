@@ -34,6 +34,7 @@ public class LogFilter implements Filter {
             chain.doFilter(req, res); // 다음 필터를 호출한다, 없다면 servlet을 호출
         } catch (Exception e) {
             throw e;
+
         } finally {
             log.info("RESPONSE [{}][{}]", uuid, requestURI);
         }
