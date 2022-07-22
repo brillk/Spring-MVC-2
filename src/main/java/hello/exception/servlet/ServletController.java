@@ -27,3 +27,4 @@ public class ServletController {
         res.sendError(500);
     }
 }
+//서블릿 예외 처리 - 오류 화면 제공
