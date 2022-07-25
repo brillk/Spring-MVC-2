@@ -7,9 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 @Slf4j
@@ -43,6 +41,14 @@ public class ApiExceptionController {
     public String responseStatusEx2() {
         throw new ResponseStatusException(HttpStatus.NOT_FOUND, "error.bad", new IllegalArgumentException());
     }
+    //ResponseStatusExceptionResolver HTTP 응답 코드 변경
+    // DefaultHandlerExceptionResolver 스프링 내부 예외 처리
+
+    @GetMapping("/api/default-handler-ex")
+    public String defaultException(@RequestParam Integer data) {
+        return "ok";
+    }
+
 
     @Data
     @AllArgsConstructor
