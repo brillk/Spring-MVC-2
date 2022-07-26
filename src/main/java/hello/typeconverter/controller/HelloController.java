@@ -19,7 +19,7 @@ public class HelloController {
         return "ok";
     }
 
-    @GetMapping("/hello-v2")
+    @GetMapping("/hello-v2") //http://localhost:8000/hello-v2?data=10,000 => data = 10000
     public String helloV2(@RequestParam Integer data) {
         System.out.println("data = " + data);
         return "ok";
