@@ -32,7 +32,7 @@ public class ServletUploadControllerV2 {
     }
 
     @PostMapping("/upload")
-    public String saveFileV1(HttpServletRequest req) throws ServletException, IOException {
+    public String saveFileV2(HttpServletRequest req) throws ServletException, IOException {
 
         log.info("req={}", req);
 
